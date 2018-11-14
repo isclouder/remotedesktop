@@ -1,0 +1,16 @@
+autoscan: warning: missing AC_CHECK_FUNCS([memset]) wanted by: 
+	src/rmd.c:179
+	src/rmd.c:180
+	src/rmd.c:208
+autoscan: warning: missing AC_CHECK_FUNCS([select]) wanted by: 
+	src/rmd.c:241
+autoscan: warning: missing AC_CHECK_HEADERS([sys/socket.h]) wanted by: 
+	src/rmd.c:14
+autoscan: warning: missing AC_FUNC_FORK wanted by: 
+	src/rmd.c:106
+	src/rmd.c:269
+autoscan: warning: missing AC_TYPE_PID_T wanted by: 
+	src/rmd.c:33
+	src/rmd.c:105
+	src/rmd.c:159
+	src/rmd.c:267
