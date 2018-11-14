@@ -119,9 +119,6 @@
 /* Define to 1 if you have the <vorbis/vorbisfile.h> header file. */
 #define HAVE_VORBIS_VORBISFILE_H 1
 
-/* Define to 1 if your C compiler doesn't accept -c and -o together. */
-/* #undef NO_MINUS_C_MINUS_O */
-
 /* Name of package */
 #define PACKAGE "remotedesktop"
 
@@ -136,6 +133,9 @@
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "remotedesktop"
+
+/* Define to the home page for this package. */
+/* #undef PACKAGE_URL */
 
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "0.3.8.1"
