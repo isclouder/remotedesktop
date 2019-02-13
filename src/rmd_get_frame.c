@@ -18,7 +18,6 @@
 
 
 int InitializeDisplay(ProgData *pdata){
-    pdata->specs.screen = DefaultScreen(pdata->dpy);
     pdata->specs.width  = DisplayWidth(pdata->dpy, pdata->specs.screen);
     pdata->specs.height = DisplayHeight(pdata->dpy, pdata->specs.screen);
     pdata->specs.root   = RootWindow(pdata->dpy, pdata->specs.screen);
@@ -40,7 +39,6 @@ int InitializeDisplay(ProgData *pdata){
                     &pdata->damage_event,
                     &pdata->damage_error);
 
-    pdata->specs_target.screen = 1;
     pdata->specs_target.width  = DisplayWidth(pdata->dpy, pdata->specs_target.screen);
     pdata->specs_target.height = DisplayHeight(pdata->dpy, pdata->specs_target.screen);
     pdata->specs_target.root   = RootWindow(pdata->dpy, pdata->specs_target.screen);

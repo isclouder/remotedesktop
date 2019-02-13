@@ -21,6 +21,8 @@ int InitializeData(ProgData *pdata){
     pdata->image               = NULL;
     pdata->running             = TRUE;
     pdata->capture_busy        = FALSE;
+    pdata->specs.screen        = DefaultScreen(pdata->dpy);
+    pdata->specs_target.screen = 1;
     return 0;
 
 }
