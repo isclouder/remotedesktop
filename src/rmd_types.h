@@ -38,6 +38,9 @@ typedef int boolean;
 #define TRUE  (!FALSE)
 #endif
 
+#define FFMIN(a,b) ((a) > (b) ? (b) : (a))
+#define FFMAX(a,b) ((a) > (b) ? (a) : (b))
+
 // Forward declarations 
 typedef struct _ProgData ProgData;
 

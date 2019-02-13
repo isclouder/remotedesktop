@@ -9,6 +9,7 @@
 #include "rmd_setbrwindow.h"
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <X11/extensions/Xfixes.h>
 #include <X11/extensions/XShm.h>
 
@@ -86,6 +87,48 @@ int FirstFrame(ProgData *pdata,
     return 0;
 }
 
+void paint_cursor(ProgData *pdata)
+{
+    int x_off = 0;
+    int y_off = 0;
+    XFixesCursorImage *xcim;
+    int width = pdata->image->width;
+    int height = pdata->image->height;
+    int x, y;
+    int line, column;
+    int to_line, to_column;
+    int pixstride = pdata->image->bits_per_pixel >> 3;
+    int8_t *pix = pdata->image->data;
+
+    if (pdata->image->bits_per_pixel != 24 && pdata->image->bits_per_pixel != 32)
+            return;
+    xcim = XFixesGetCursorImage(pdata->dpy);
+    x = xcim->x - xcim->xhot;
+    y = xcim->y - xcim->yhot;
+    to_line = FFMIN((y + xcim->height), (height + y_off));
+    to_column = FFMIN((x + xcim->width), (width + x_off));
+    for (line = FFMAX(y, y_off); line < to_line; line++) {
+            for (column = FFMAX(x, x_off); column < to_column; column++) {
+                    int  xcim_addr = (line - y) * xcim->width + column - x;
+                    int image_addr = ((line - y_off) * width + column - x_off) * pixstride;
+                    int r = (uint8_t)(xcim->pixels[xcim_addr] >>  0);
+                    int g = (uint8_t)(xcim->pixels[xcim_addr] >>  8);
+                    int b = (uint8_t)(xcim->pixels[xcim_addr] >> 16);
+                    int a = (uint8_t)(xcim->pixels[xcim_addr] >> 24);
+                    if (a == 255) {
+                            pix[image_addr+0] = r;
+                            pix[image_addr+1] = g;
+                            pix[image_addr+2] = b;
+                    } else if (a) {
+                            pix[image_addr+0] = r + (pix[image_addr+0]*(255-a) + 255/2) / 255;
+                            pix[image_addr+1] = g + (pix[image_addr+1]*(255-a) + 255/2) / 255;
+                            pix[image_addr+2] = b + (pix[image_addr+2]*(255-a) + 255/2) / 255;
+                    }
+            }
+    }
+    XFree(xcim);
+    xcim = NULL;
+}
 
 void *GetFrame(ProgData *pdata){
     int init=0;
@@ -105,10 +148,15 @@ void *GetFrame(ProgData *pdata){
 
         pdata->capture_busy = TRUE;
 
+        //display
         XShmGetImage(pdata->dpy,pdata->specs.root,
                     (pdata->image),
                     (pdata->brwin.rrect.x),
                     (pdata->brwin.rrect.y),AllPlanes);
+
+        //cursor
+        paint_cursor(pdata);
+        //draw
         XShmPutImage(pdata->dpy,pdata->specs_target.root,pdata->specs_target.gc,pdata->image,0,0,0,0,pdata->brwin.rrect.width,pdata->brwin.rrect.height,1);
 
         pdata->capture_busy = FALSE;
