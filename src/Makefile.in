@@ -106,7 +106,6 @@ am_remotedesktop_OBJECTS = remotedesktop-rmd.$(OBJEXT) \
 	remotedesktop-rmd_error.$(OBJEXT) \
 	remotedesktop-rmd_get_frame.$(OBJEXT) \
 	remotedesktop-rmd_initialize_data.$(OBJEXT) \
-	remotedesktop-rmd_queryextensions.$(OBJEXT) \
 	remotedesktop-rmd_setbrwindow.$(OBJEXT) \
 	remotedesktop-rmd_threads.$(OBJEXT) \
 	remotedesktop-rmd_timer.$(OBJEXT)
@@ -285,8 +284,6 @@ remotedesktop_SOURCES = \
 	rmd_get_frame.h \
 	rmd_initialize_data.c \
 	rmd_initialize_data.h \
-	rmd_queryextensions.c \
-	rmd_queryextensions.h \
 	rmd_setbrwindow.c \
 	rmd_setbrwindow.h \
 	rmd_threads.c \
@@ -387,7 +384,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remotedesktop-rmd_error.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remotedesktop-rmd_get_frame.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remotedesktop-rmd_initialize_data.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remotedesktop-rmd_queryextensions.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remotedesktop-rmd_setbrwindow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remotedesktop-rmd_start.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/remotedesktop-rmd_threads.Po@am__quote@
@@ -476,20 +472,6 @@ remotedesktop-rmd_initialize_data.obj: rmd_initialize_data.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='rmd_initialize_data.c' object='remotedesktop-rmd_initialize_data.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remotedesktop_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o remotedesktop-rmd_initialize_data.obj `if test -f 'rmd_initialize_data.c'; then $(CYGPATH_W) 'rmd_initialize_data.c'; else $(CYGPATH_W) '$(srcdir)/rmd_initialize_data.c'; fi`
-
-remotedesktop-rmd_queryextensions.o: rmd_queryextensions.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remotedesktop_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT remotedesktop-rmd_queryextensions.o -MD -MP -MF $(DEPDIR)/remotedesktop-rmd_queryextensions.Tpo -c -o remotedesktop-rmd_queryextensions.o `test -f 'rmd_queryextensions.c' || echo '$(srcdir)/'`rmd_queryextensions.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/remotedesktop-rmd_queryextensions.Tpo $(DEPDIR)/remotedesktop-rmd_queryextensions.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='rmd_queryextensions.c' object='remotedesktop-rmd_queryextensions.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remotedesktop_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o remotedesktop-rmd_queryextensions.o `test -f 'rmd_queryextensions.c' || echo '$(srcdir)/'`rmd_queryextensions.c
-
-remotedesktop-rmd_queryextensions.obj: rmd_queryextensions.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remotedesktop_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT remotedesktop-rmd_queryextensions.obj -MD -MP -MF $(DEPDIR)/remotedesktop-rmd_queryextensions.Tpo -c -o remotedesktop-rmd_queryextensions.obj `if test -f 'rmd_queryextensions.c'; then $(CYGPATH_W) 'rmd_queryextensions.c'; else $(CYGPATH_W) '$(srcdir)/rmd_queryextensions.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/remotedesktop-rmd_queryextensions.Tpo $(DEPDIR)/remotedesktop-rmd_queryextensions.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='rmd_queryextensions.c' object='remotedesktop-rmd_queryextensions.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remotedesktop_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o remotedesktop-rmd_queryextensions.obj `if test -f 'rmd_queryextensions.c'; then $(CYGPATH_W) 'rmd_queryextensions.c'; else $(CYGPATH_W) '$(srcdir)/rmd_queryextensions.c'; fi`
 
 remotedesktop-rmd_setbrwindow.o: rmd_setbrwindow.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(remotedesktop_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT remotedesktop-rmd_setbrwindow.o -MD -MP -MF $(DEPDIR)/remotedesktop-rmd_setbrwindow.Tpo -c -o remotedesktop-rmd_setbrwindow.o `test -f 'rmd_setbrwindow.c' || echo '$(srcdir)/'`rmd_setbrwindow.c

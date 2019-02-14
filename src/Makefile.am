@@ -10,8 +10,6 @@ remotedesktop_SOURCES = \
 	rmd_get_frame.h \
 	rmd_initialize_data.c \
 	rmd_initialize_data.h \
-	rmd_queryextensions.c \
-	rmd_queryextensions.h \
 	rmd_setbrwindow.c \
 	rmd_setbrwindow.h \
 	rmd_threads.c \

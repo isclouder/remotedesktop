@@ -5,7 +5,6 @@
 ******************************************************************************/
 
 #include "rmd_types.h"
-#include "rmd_queryextensions.h"
 #include "rmd_setbrwindow.h"
 
 #include <stdlib.h>
@@ -34,10 +33,6 @@ int InitializeDisplay(ProgData *pdata){
     }
     if (!SetBRWindow(pdata->dpy, &pdata->brwin, &pdata->specs, &pdata->args))
         return -1;
-    QueryExtensions(pdata->dpy,
-                    &pdata->args,
-                    &pdata->damage_event,
-                    &pdata->damage_error);
 
     pdata->specs_target.width  = DisplayWidth(pdata->dpy, pdata->specs_target.screen);
     pdata->specs_target.height = DisplayHeight(pdata->dpy, pdata->specs_target.screen);
@@ -96,7 +91,7 @@ void paint_cursor(ProgData *pdata)
     int line, column;
     int to_line, to_column;
     int pixstride = pdata->image->bits_per_pixel >> 3;
-    int8_t *pix = pdata->image->data;
+    int8_t *pix = (int8_t *)(pdata->image->data);
 
     if (pdata->image->bits_per_pixel != 24 && pdata->image->bits_per_pixel != 32)
             return;

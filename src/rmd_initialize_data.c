@@ -34,7 +34,6 @@ void SetupDefaultArgs(ProgArgs *args) {
     args->y                    = 0;
     args->width                = 0;
     args->height               = 0;
-    args->full_shots           = 0;
     args->fps                  = 20;
 
     if (getenv("DISPLAY") != NULL) {

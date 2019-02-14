@@ -68,7 +68,6 @@ typedef struct _ProgArgs{
     int x,y;            //x,y offset(default 0,0)
     unsigned int width,height;   //defaults to window width and height
     float fps;              //desired framerate(default 15)
-    int full_shots;     //do not poll damage, take full screenshots
 }ProgArgs;
 
 typedef struct _HotKey{     //Hold info about the shortcuts
