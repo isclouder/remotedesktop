@@ -5,7 +5,7 @@
 ******************************************************************************/
 
 #include "rmd_start.h"
-
+#include <syslog.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,7 +40,7 @@ void x11_xrandr(Display *dpy, int screen, int width, int height){
     int         size = -1;
     Status      status = RRSetConfigFailed;
 
-    printf("set screen(%d) to %dx%d\n", screen,width,height);
+    syslog(LOG_INFO, "set screen(%d) to %dx%d\n", screen,width,height);
 
     root = RootWindow (dpy, screen);
     sc = XRRGetScreenInfo (dpy, root);
@@ -53,21 +53,20 @@ void x11_xrandr(Display *dpy, int screen, int width, int height){
             break;
     }
     if (size >= nsize){
-        fprintf (stderr,
-                 "Size %dx%d not found in available modes\n", width, height);
+        syslog(LOG_ERR, "Size %dx%d not found in available modes\n", width, height);
         exit (1);
     }
     status = XRRSetScreenConfigAndRate (dpy, sc, root, (SizeID) size, (Rotation) (1),
                                             0.000000, 0);
     if (status == RRSetConfigFailed){
-        printf ("Failed to change the screen configuration!\n");
+        syslog(LOG_ERR, "Failed to change the screen configuration!\n");
     } 
 }
 
 static void x11_xrandr_1(Display *dpy, int screen, XRRScreenResources *res){
     int i;
     for (i = 0 ; i <res->nmode ; ++i){
-        printf("screen(%d):%dx%d\n",screen,res->modes[i].width,res->modes[i].height);
+        syslog(LOG_INFO, "screen(%d):%dx%d\n",screen,res->modes[i].width,res->modes[i].height);
     }
     x11_xrandr(dpy, screen, res->modes[0].width, res->modes[0].height);
 }
@@ -77,7 +76,7 @@ static void x11_xrandr_0(Display *dpy, int screen, XRRScreenResources *res, int 
     int w = DisplayWidth(dpy, screen);
     int h = DisplayHeight(dpy, screen);
     for (i = 0 ; i <res->nmode ; ++i){
-        printf("screen(%d):%dx%d\n",screen,res->modes[i].width,res->modes[i].height);
+        syslog(LOG_INFO, "screen(%d):%dx%d\n",screen,res->modes[i].width,res->modes[i].height);
     }
     if(w==width && h==height){
         return;
@@ -105,13 +104,13 @@ static void x11_xrandr_0(Display *dpy, int screen, XRRScreenResources *res, int 
     pid_t pid;
     pid=fork();
     if(pid < 0){
-	printf("fork error\n");
+	syslog(LOG_ERR, "fork error\n");
     }
     else if(pid == 0){
 	rmd_start();
     }
     else{
-	printf("rmd new pid is:%d\n", pid);
+	syslog(LOG_INFO, "rmd new pid is:%d\n", pid);
 	fpid = pid;
     }
 }
@@ -126,13 +125,13 @@ static void x11_get_mode(){
 
     display = XOpenDisplay(display_name);
     if (!display){
-        printf("could not connect to X-server\n");
+        syslog(LOG_ERR, "could not connect to X-server:%s\n", display_name);
         return;
     }
 
     screen_count = ScreenCount(display);
     if (screen_count > MAX_SCREENS){
-        printf("Error too much screens: %d > %d\n",
+        syslog(LOG_ERR, "Error too much screens: %d > %d\n",
                screen_count, MAX_SCREENS);
         XCloseDisplay(display);
         return;
@@ -159,20 +158,11 @@ static void sig_child(int signum){
     pid_t pid;
     int stat;
     pid = wait(&stat);    
-    printf( "child %d exit\n", pid);
+    syslog(LOG_ERR, "child %d exit\n", pid);
     return;
 } 
  
-static void print_device(struct udev_device *device, const char *source, int env){
-	if (env){
-		struct udev_list_entry *list_entry;
-		udev_list_entry_foreach(list_entry, udev_device_get_properties_list_entry(device))
-			printf("%s=%s\n",
-			       udev_list_entry_get_name(list_entry),
-			       udev_list_entry_get_value(list_entry));
-		printf("\n");
-	}
-
+static void print_device(struct udev_device *device, const char *source){
         if (strcmp(udev_device_get_subsystem(device),"drm") == 0){
             FILE *fp;
             char path[256], vendor[7];
@@ -193,14 +183,13 @@ static void print_device(struct udev_device *device, const char *source, int env
  
 int udevadm_monitor(struct udev *udev){
 	struct sigaction act;
-	int env = 0;
 	int print_kernel = 1;
 	struct udev_monitor *kernel_monitor = NULL;
 	fd_set readfds;
 	int rc = 0;
  
 	if (getuid() != 0){
-		fprintf(stderr, "root privileges needed to subscribe to kernel events\n");
+		syslog(LOG_ERR, "root privileges needed to subscribe to kernel events\n");
 		goto out;
 	}
  
@@ -217,7 +206,7 @@ int udevadm_monitor(struct udev *udev){
 		kernel_monitor = udev_monitor_new_from_netlink(udev, "udev");
 		if (kernel_monitor == NULL){
 			rc = 3;
-			printf("udev_monitor_new_from_netlink() error\n");
+			syslog(LOG_ERR, "udev_monitor_new_from_netlink() error\n");
 			goto out;
 		}
  
@@ -225,11 +214,8 @@ int udevadm_monitor(struct udev *udev){
 			rc = 4;
 			goto out;
 		}
- 
-		//printf("UEVENT the kernel uevent: \n");
 	}
 	
-	printf("\n");
         x11_get_mode();
 	while (!udev_exit){
 		int fdcount;
@@ -241,7 +227,7 @@ int udevadm_monitor(struct udev *udev){
 		fdcount = select(udev_monitor_get_fd(kernel_monitor)+1, &readfds, NULL, NULL, NULL);
 		if (fdcount < 0){
 			if (errno != EINTR)
-				fprintf(stderr, "error receiving uevent message: %m\n");
+				syslog(LOG_ERR, "error receiving uevent message: %m\n");
 			continue;
 		}
  
@@ -250,7 +236,7 @@ int udevadm_monitor(struct udev *udev){
 			device = udev_monitor_receive_device(kernel_monitor);
 			if (device == NULL)
 				continue;
-			print_device(device, "UEVENT", env);
+			print_device(device, "UEVENT");
 			udev_device_unref(device);
 		}
  
@@ -268,15 +254,15 @@ int main(int argc, char *argv[]){
 
     pid=fork();
     if(pid < 0){
-	printf("fork error\n");
+	syslog(LOG_ERR, "fork error\n");
 	return -1;
     }
     else if(pid == 0){
 	rmd_start();
     }
     else{
-	printf("main pid is:%d\n", getpid());
-	printf("rmd pid is:%d\n", pid);
+	syslog(LOG_INFO, "main pid is:%d\n", getpid());
+	syslog(LOG_INFO, "rmd pid is:%d\n", pid);
         fpid = pid;
         udev = udev_new();
         if (udev == NULL){
@@ -286,7 +272,7 @@ int main(int argc, char *argv[]){
         udevadm_monitor(udev);
         udev_unref(udev);
     }
-    printf("main pid exit\n");
+    syslog(LOG_INFO, "main pid exit\n");
     return 0;
 }
 
