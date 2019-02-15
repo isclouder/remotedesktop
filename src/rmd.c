@@ -100,19 +100,8 @@ static void x11_xrandr_0(Display *dpy, int screen, XRRScreenResources *res, int 
     }
     x11_xrandr(dpy, screen, res->modes[m].width, res->modes[m].height);
  
+    syslog(LOG_INFO, "restart rmd thread:%d\n", fpid);
     kill(fpid, SIGTERM); 
-    pid_t pid;
-    pid=fork();
-    if(pid < 0){
-	syslog(LOG_ERR, "fork error\n");
-    }
-    else if(pid == 0){
-	rmd_start();
-    }
-    else{
-	syslog(LOG_INFO, "rmd new pid is:%d\n", pid);
-	fpid = pid;
-    }
 }
 
 static void x11_get_mode(){
@@ -158,7 +147,21 @@ static void sig_child(int signum){
     pid_t pid;
     int stat;
     pid = wait(&stat);    
-    syslog(LOG_ERR, "child %d exit\n", pid);
+    syslog(LOG_ERR, "rmd %d exit\n", pid);
+
+    sleep(1);
+    pid=fork();
+    if(pid < 0){
+        syslog(LOG_ERR, "fork error\n");
+    }
+    else if(pid == 0){
+        rmd_start();
+    }
+    else{
+        syslog(LOG_INFO, "rmd new pid is:%d\n", pid);
+        fpid = pid;
+    }
+
     return;
 } 
  

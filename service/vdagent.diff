@@ -1,0 +1,38 @@
+diff --git a/spice-vdagent b/spice-vdagent
+index 6d67fc9..3652e9f 100755
+Binary files a/spice-vdagent and b/spice-vdagent differ
+diff --git a/src_spice_vdagent-vdagent-x11-randr.o b/src_spice_vdagent-vdagent-x11-randr.o
+index d57f1c5..f1c71f0 100644
+Binary files a/src_spice_vdagent-vdagent-x11-randr.o and b/src_spice_vdagent-vdagent-x11-randr.o differ
+diff --git a/vdagent-x11-randr.c b/vdagent-x11-randr.c
+index 0ed5246..e437b39 100644
+--- a/vdagent-x11-randr.c
++++ b/vdagent-x11-randr.c
+@@ -123,11 +123,11 @@ void vdagent_x11_randr_init(struct vdagent_x11 *x11)
+ {
+     int i;
+ 
+-    if (x11->screen_count > 1) {
+-        syslog(LOG_WARNING, "X-server has more then 1 screen, "
+-               "disabling client -> guest resolution syncing");
+-        return;
+-    }
++    //if (x11->screen_count > 1) {
++    //    syslog(LOG_WARNING, "X-server has more then 1 screen, "
++    //           "disabling client -> guest resolution syncing");
++    //    return;
++   // }
+ 
+     if (XRRQueryExtension(x11->display, &i, &i)) {
+         XRRQueryVersion(x11->display, &x11->xrandr_major, &x11->xrandr_minor);
+@@ -629,8 +629,8 @@ static VDAgentMonitorsConfig *get_current_mon_config(struct vdagent_x11 *x11)
+     for (i = 0 ; i < res->noutput; i++) {
+         if (x11->randr.outputs[i]->ncrtc == 0)
+             continue; /* Monitor disabled, already zero-ed by calloc */
+-        if (x11->randr.outputs[i]->ncrtc != 1)
+-            goto error;
++        //if (x11->randr.outputs[i]->ncrtc != 1)
++        //    goto error;
+ 
+         crtc = crtc_from_id(x11, x11->randr.outputs[i]->crtcs[0]);
+         if (!crtc)

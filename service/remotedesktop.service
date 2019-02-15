@@ -1,0 +1,15 @@
+[Unit]  
+Description=remotedesktop
+After=network.target  
+   
+[Service]  
+Type=forking  
+PIDFile=/var/run/remotedesktop/remotedesktop.pid
+Environment=DISPLAY=:0
+ExecStart=/usr/bin/remotedesktop
+ExecReload=  
+ExecStop=
+PrivateTmp=true  
+   
+[Install]  
+WantedBy=multi-user.target  
