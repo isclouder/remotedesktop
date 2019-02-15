@@ -1,4 +1,7 @@
 Makefile
+autoscan.log
 config.log
 config.status
+config.h*
 stamp-h1
+autom4te.cache

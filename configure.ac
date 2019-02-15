@@ -89,10 +89,12 @@ AC_CHECK_LIB([vorbisfile],[ov_open],,
 AC_CHECK_LIB([vorbisenc],[vorbis_encode_init],,
              AC_MSG_ERROR([Can't find libvorbisenc]),-lvorbis)
 AC_CHECK_LIB([ogg],[ogg_stream_init],,AC_MSG_ERROR([Can't find libogg]))
-AC_CHECK_LIB([theora],[theora_encode_YUVin],,
-             AC_MSG_ERROR([Can't find libtheora]))
 AC_CHECK_LIB([pthread],[pthread_mutex_lock],,
              AC_MSG_ERROR([Can't find libpthread]))
+AC_CHECK_LIB([Xrandr], [XRRSetScreenConfigAndRate],,
+             AC_MSG_ERROR([Can't find libXrandr]))
+AC_CHECK_LIB([udev], [udev_monitor_new_from_netlink],,
+             AC_MSG_ERROR([Can't find libudev]))
 
 if test x$jack = xtrue ; then
 AC_CHECK_LIB([jack],[jack_activate],jack_lib_found=true,)
