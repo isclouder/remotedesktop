@@ -101,7 +101,7 @@ static void x11_xrandr_0(Display *dpy, int screen, XRRScreenResources *res, int 
     x11_xrandr(dpy, screen, res->modes[m].width, res->modes[m].height);
  
     syslog(LOG_INFO, "restart rmd thread:%d\n", fpid);
-    kill(fpid, SIGTERM); 
+    kill(fpid, SIGKILL); 
 }
 
 static void x11_get_mode(){
@@ -149,7 +149,7 @@ static void sig_child(int signum){
     pid = wait(&stat);    
     syslog(LOG_ERR, "rmd %d exit\n", pid);
 
-    sleep(1);
+    sleep(2);
     pid=fork();
     if(pid < 0){
         syslog(LOG_ERR, "fork error\n");

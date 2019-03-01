@@ -13,6 +13,10 @@
 #include <X11/extensions/Xfixes.h>
 #include <X11/extensions/XShm.h>
 
+#include <X11/Xlib.h>
+#include <X11/Xlibint.h>
+#include <X11/extensions/shmstr.h>
+
 #include <sys/shm.h>
 #include <errno.h>
 
@@ -65,6 +69,39 @@ int QueryExtensions(Display *dpy,
         syslog(LOG_ERR, "Xfixes extension not present!\n");
         return -1;
     }
+    return 0;
+}
+
+int GetZPixmap(Display *dpy,
+               Window root,
+               char *data,
+               int x,
+               int y,
+               int width,
+               int height){
+    xGetImageReply reply;
+    xGetImageReq *request;
+    long nbytes;
+
+    LockDisplay(dpy);
+    GetReq(GetImage,request);
+    request->drawable=root;
+    request->x=x;
+    request->y=y;
+    request->width=width;
+    request->height=height;
+    request->planeMask=AllPlanes;
+    request->format=ZPixmap;
+    if((!_XReply(dpy,(xReply *)&reply,0,xFalse))||(!reply.length)){
+        UnlockDisplay(dpy);
+        SyncHandle();
+        return 1;
+    }
+    nbytes=(long)reply.length<<2;
+    _XReadPad(dpy,data,nbytes);
+    UnlockDisplay(dpy);
+    SyncHandle();
+    return 0;
 }
 
 int FirstFrame(ProgData *pdata,
@@ -145,6 +182,63 @@ void paint_cursor(ProgData *pdata)
     }
     XFree(xcim);
     xcim = NULL;
+}
+
+void *GetFrame_cp(ProgData *pdata){
+    int init=0;
+    char *pxl_data=NULL;
+    if((init=InitializeDisplay(pdata))!=0){
+        exit(init);
+    }
+
+    if((init=QueryExtensions(pdata->dpy,&pdata->shm_opcode))!=0){
+        exit(init);
+    }
+    pxl_data=(char *)malloc(pdata->brwin.nbytes);
+
+    pdata->image=XCreateImage(pdata->dpy,
+                            pdata->specs.visual,
+                            pdata->specs.depth,
+                            ZPixmap,
+                            0,
+                            pxl_data,
+                            pdata->brwin.rrect.width,
+                            pdata->brwin.rrect.height,
+                            8,
+                            0);
+     XInitImage(pdata->image);
+     GetZPixmap(pdata->dpy,pdata->specs.root,
+                   pdata->image->data,
+                   pdata->brwin.rrect.x,
+                   pdata->brwin.rrect.y,
+                   pdata->brwin.rrect.width,
+                   pdata->brwin.rrect.height);
+
+    syslog(LOG_INFO, "start get image\n");
+    while(pdata->running){
+        pthread_mutex_lock(&pdata->time_mutex);
+        pthread_cond_wait(&pdata->time_cond, &pdata->time_mutex);
+        pthread_mutex_unlock(&pdata->time_mutex);
+
+        pdata->capture_busy = TRUE;
+
+        //display
+        GetZPixmap(pdata->dpy,
+                   pdata->specs.root,
+                   pdata->image->data,
+                   pdata->brwin.rrect.x,
+                   pdata->brwin.rrect.y,
+                   pdata->brwin.rrect.width,
+                   pdata->brwin.rrect.height);
+
+        //cursor
+        //paint_cursor(pdata);
+        //draw
+        XPutImage(pdata->dpy, pdata->specs_target.root,pdata->specs_target.gc,pdata->image, 0, 0, 0, 0, pdata->brwin.rrect.width,pdata->brwin.rrect.height);
+        pdata->capture_busy = FALSE;
+    }
+
+    pthread_exit(&errno);
 }
 
 void *GetFrame(ProgData *pdata){
