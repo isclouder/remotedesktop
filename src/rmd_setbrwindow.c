@@ -4,6 +4,7 @@
 *                                                                             *
 ******************************************************************************/
 
+#include <syslog.h>
 #include "config.h"
 #include "rmd_setbrwindow.h"
 
@@ -123,7 +124,7 @@ boolean SetBRWindow(Display *dpy,
         //and then check validity
         if((brwin->rrect.x+brwin->rrect.width>specs->width)||
             (brwin->rrect.y+brwin->rrect.height>specs->height)){
-            fprintf(stderr,"Window size specification out of bounds!"
+            syslog(LOG_ERR, "Window size specification out of bounds!"
                            "(current resolution:%dx%d)\n",
                            specs->width,specs->height);
             return FALSE;
@@ -136,7 +137,7 @@ boolean SetBRWindow(Display *dpy,
         XWindowAttributes attribs;
         XGetWindowAttributes(dpy,args->windowid,&attribs);
         if((attribs.map_state==IsUnviewable)||(attribs.map_state==IsUnmapped)){
-            fprintf(stderr,"Window must be mapped and visible!\n");
+            syslog(LOG_ERR, "Window must be mapped and visible!\n");
             return FALSE;
         }
         XTranslateCoordinates(dpy,
@@ -154,7 +155,7 @@ boolean SetBRWindow(Display *dpy,
         brwin->rect.height=attribs.height;
         if((brwin->rect.x+brwin->rect.width>specs->width)||
             (brwin->rect.y+brwin->rect.height>specs->height)){
-            fprintf(stderr,"Window must be on visible screen area!\n");
+            syslog(LOG_ERR, "Window must be on visible screen area!\n");
             return FALSE;
         }
 
@@ -166,18 +167,18 @@ boolean SetBRWindow(Display *dpy,
                              args->height:brwin->rect.height-args->y);
         if((args->x+brwin->rrect.width>brwin->rect.width)||
             (args->y+brwin->rrect.height>brwin->rect.height)){
-            fprintf(stderr,"Specified Area is larger than window!\n");
+            syslog(LOG_ERR, "Specified Area is larger than window!\n");
             return FALSE;
         }
     }
-    fprintf(stderr, "Initial recording window is set to:\n"
+    syslog(LOG_INFO, "Initial recording window is set to:\n"
                     "X:%d   Y:%d    Width:%d    Height:%d\n",
                     brwin->rrect.x,brwin->rrect.y,
                     brwin->rrect.width,brwin->rrect.height);
     SizePack2_8_16(&brwin->rrect.x,&brwin->rrect.width,specs->width);
     SizePack2_8_16(&brwin->rrect.y,&brwin->rrect.height,specs->height);
 
-    fprintf(stderr, "Adjusted recording window is set to:\n"
+    syslog(LOG_INFO, "Adjusted recording window is set to:\n"
                     "X:%d   Y:%d    Width:%d    Height:%d\n",
                     brwin->rrect.x,brwin->rrect.y,
                     brwin->rrect.width,brwin->rrect.height);

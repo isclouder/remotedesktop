@@ -97,6 +97,7 @@ struct _ProgData {
 /**Buffers,Flags and other vars*/
     int damage_event,       //damage event base code
         damage_error,       //damage error base code
+        shm_opcode,
         timer_alive;        //determines loop of timer thread
 
     /** Progam state vars */

@@ -13,6 +13,7 @@
 
 #include <pthread.h>
 
+#include <syslog.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -35,7 +36,7 @@ void rmdThreads(ProgData *pdata){
 
     //wait all threads to finish
     pthread_join(image_capture_t,NULL);
-    fprintf(stderr,"Shutting down.");
+    syslog(LOG_ERR, "Shutting down.");
 
     //Now that we are done with recording we cancel the timer
     pdata->timer_alive=0;

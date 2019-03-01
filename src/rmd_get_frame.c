@@ -8,6 +8,7 @@
 #include "rmd_setbrwindow.h"
 
 #include <stdlib.h>
+#include <syslog.h>
 #include <stdint.h>
 #include <X11/extensions/Xfixes.h>
 #include <X11/extensions/XShm.h>
@@ -27,12 +28,14 @@ int InitializeDisplay(ProgData *pdata){
     if((pdata->specs.depth!=32)&&
        (pdata->specs.depth!=24)&&
        (pdata->specs.depth!=16)){
-        fprintf(stderr,"Only 32bpp,24bpp and 16bpp"
+        syslog(LOG_ERR, "Only 32bpp,24bpp and 16bpp"
                        " color depth modes are currently supported.\n");
         return -1;
     }
-    if (!SetBRWindow(pdata->dpy, &pdata->brwin, &pdata->specs, &pdata->args))
+    if (!SetBRWindow(pdata->dpy, &pdata->brwin, &pdata->specs, &pdata->args)){
+        syslog(LOG_ERR, "SetBRWindow err.\n");
         return -1;
+    }
 
     pdata->specs_target.width  = DisplayWidth(pdata->dpy, pdata->specs_target.screen);
     pdata->specs_target.height = DisplayHeight(pdata->dpy, pdata->specs_target.screen);
@@ -43,6 +46,27 @@ int InitializeDisplay(ProgData *pdata){
 
     return 0;
 }
+int QueryExtensions(Display *dpy,
+                     int *shm_opcode){
+    int xf_event_basep,
+        xf_error_basep,
+        shm_event_base,
+        shm_error_base;
+
+    if(!XQueryExtension(dpy,
+                        "MIT-SHM",
+                        shm_opcode,
+                        &shm_event_base,
+                        &shm_error_base)){
+        syslog(LOG_ERR, "Shared Memory extension not present!\n");
+        return -1;
+    }
+    if(XFixesQueryExtension(dpy,&xf_event_basep,&xf_error_basep)==False){
+        syslog(LOG_ERR, "Xfixes extension not present!\n");
+        return -1;
+    }
+}
+
 int FirstFrame(ProgData *pdata,
                       XImage **image) {
 
@@ -60,14 +84,14 @@ int FirstFrame(ProgData *pdata,
                                 (*image)->height,
                                 IPC_CREAT|0777);
     if((pdata->shminfo).shmid==-1){
-        fprintf(stderr,"Failed to obtain Shared Memory segment!\n");
+        syslog(LOG_ERR, "Failed to obtain Shared Memory segment!\n");
         return 12;
     }
     (pdata->shminfo).shmaddr=(*image)->data=shmat((pdata->shminfo).shmid,
                                                     NULL,0);
     (pdata->shminfo).readOnly = False;
     if(!XShmAttach(pdata->dpy,&(pdata->shminfo))){
-        fprintf(stderr,"Failed to attach shared memory to proccess.\n");
+        syslog(LOG_ERR, "Failed to attach shared memory to proccess.\n");
         return 12;
     }
     XShmGetImage(pdata->dpy,
@@ -129,11 +153,15 @@ void *GetFrame(ProgData *pdata){
         exit(init);
     }
 
+    if((init=QueryExtensions(pdata->dpy,&pdata->shm_opcode))!=0){
+        exit(init);
+    }
+
     if((init=FirstFrame(pdata,&(pdata->image))!=0)){
         exit(init);
     }
     
-    fprintf(stderr,"start get image\n");
+    syslog(LOG_INFO, "start get image\n");
     while(pdata->running){
         pthread_mutex_lock(&pdata->time_mutex);
         pthread_cond_wait(&pdata->time_cond, &pdata->time_mutex);

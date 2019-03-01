@@ -7,13 +7,14 @@
 #include "rmd_initialize_data.h"
 #include "rmd_types.h"
 
+#include <syslog.h>
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
 int InitializeData(ProgData *pdata){
-    fprintf(stderr,"Initializing...\n");
+    syslog(LOG_INFO, "Initializing...\n");
 
 
     pthread_mutex_init(&pdata->time_mutex, NULL);
