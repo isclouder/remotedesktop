@@ -270,7 +270,7 @@ void *GetFrame(ProgData *pdata){
                     (pdata->brwin.rrect.y),AllPlanes);
 
         //cursor
-        paint_cursor(pdata);
+        //paint_cursor(pdata);
         //draw
         XShmPutImage(pdata->dpy,pdata->specs_target.root,pdata->specs_target.gc,pdata->image,0,0,0,0,pdata->brwin.rrect.width,pdata->brwin.rrect.height,1);
 

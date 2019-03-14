@@ -1,15 +1,16 @@
 [Unit]  
 Description=remotedesktop
-After=network.target  
+#After=network.target  
+After=spice-vdagentd.service
    
 [Service]  
-Type=forking  
+Type=simple
 PIDFile=/var/run/remotedesktop/remotedesktop.pid
 Environment=DISPLAY=:0
 ExecStart=/usr/bin/remotedesktop
 ExecReload=  
 ExecStop=
-PrivateTmp=true  
+#PrivateTmp=true  
    
 [Install]  
-WantedBy=multi-user.target  
+WantedBy=graphical.target
